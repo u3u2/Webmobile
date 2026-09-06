@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>webmobilefreeHD</title>
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    user-select: none;
+  }
+
+  body {
+    background-color: #fff;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .chromeWindow {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+  }
+
+  .tabStrip {
+    background: linear-gradient(to bottom, #EA4335 0%, #B31412 100%);
+    height: 60px;
+    padding-top: 10px;
+    padding-left: 12px;
+    display: flex;
+    align-items: flex-end;
+    position: relative;
+    border-bottom: 1px solid #8ba3c1;
+    gap: 8px;
+  }
+
+  .stripIcon {
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+    margin-right: 8px;
+    margin-bottom: 5px;
+  }
+
+  .tab {
+    position: relative;
+    height: 50px;
+    width: 250px;
+    margin-right: -18px;
+    display: flex;
+    align-items: center;
+    padding: 0 40px;
+    font-size: 15px;
+    color: #333;
+    cursor: default;
+  }
+
+  .tabBg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, #C48F00, #614600);
+    clip-path: polygon(16px 0, calc(100% - 16px) 0, 100% 100%, 0 100%);
+    border-top: 1px solid #7a97ba;
+    z-index: 1;
+  }
+
+  .tab.active .tabBg {
+    background: linear-gradient(to bottom, #FBBC04, #C48F00);
+    z-index: 3;
+  }
+
+  .tabContent {
+    position: relative;
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 10px;
+  }
+
+  .tabFavicon {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+  }
+
+  .tabTitle {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+  }
+
+  .closeBtn {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    cursor: pointer;
+    line-height: 20px;
+  }
+
+  .closeBtn:hover {
+    background: #e81123;
+    color: white;
+  }
+
+  .newTabBtn {
+    width: 40px;
+    height: 30px;
+    background: linear-gradient(to bottom, #bdcee4, #a3bad7);
+    clip-path: polygon(10px 0, 30px 0, 40px 100%, 0 100%);
+    margin-left: 24px;
+    margin-bottom: 4px;
+    border: 1px solid #7a97ba;
+    cursor: pointer;
+    z-index: 10;
+  }
+
+  .toolbar {
+    background: linear-gradient(to bottom, #34A853 0%, #1E6F35 100%);
+    height: 60px;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    gap: 10px;
+    border-bottom: 1px solid #a0a0a0;
+  }
+
+  .navBtn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    cursor: pointer;
+  }
+
+  .navBtn:hover {
+    background: radial-gradient(circle, #ffffff 0%, #e0e0e0 100%);
+    border-color: #a0a0a0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+
+  .navBtn img {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+    opacity: 0.7;
+  }
+
+  .navBtn:hover img {
+    opacity: 1;
+  }
+
+  .omnibox {
+    flex: 1;
+    height: 42px;
+    background: #4285F4;
+    border: 1px solid #848484;
+    border-radius: 21px;
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+  }
+
+  .omnibox input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 18px;
+    color: #fff;
+    user-select: text;
+  }
+
+  .starIcon {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    cursor: pointer;
+    margin-left: 8px;
+    opacity: 0.6;
+  }
+
+  .starIcon:hover {
+    opacity: 1;
+  }
+
+  .wrenchBtn {
+    width: 46px;
+    height: 44px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  .wrenchBtn:hover {
+    background: rgba(0,0,0,0.05);
+    border: 1px solid #1A56BC;
+  }
+
+  .wrenchBtn img {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+    opacity: 0.7;
+  }
+
+  .wrenchBtn:hover img {
+    opacity: 1;
+  }
+
+  .contentContainer {
+    flex: 1;
+    position: relative;
+    background: #fff;
+    overflow: hidden;
+  }
+
+  .viewport {
+    width: 100%;
+    height: 100%;
+    background: #f2f2f2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    gap: 20px;
+  }
+
+  .ntpImage {
+    max-width: 200px;
+    max-height: 200px;
+    object-fit: contain;
+  }
+
+  .ntpLinkImage {
+    max-width: 120px;
+    max-height: 120px;
+    object-fit: contain;
+    cursor: pointer;
+    transition: transform 0.2s ease, filter 0.2s ease;
+  }
+
+  .ntpLinkImage:hover {
+    transform: scale(1.05);
+    filter: brightness(1.1);
+  }
+
+  /* Files App Styles with URL Icons */
+  .filesView {
+    width: 100%;
+    height: 100%;
+    background: #f2f2f2;
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 5;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  .filesHeader {
+    height: 50px;
+    background: linear-gradient(to bottom, #4285F4 0%, #1A56BC 100%);
+    border-bottom: 1px solid #15459e;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  }
+
+  .folderSelectBtn {
+    background: linear-gradient(to bottom, #34A853 0%, #1E6F35 100%);
+    color: white;
+    border: 1px solid #154e26;
+    padding: 6px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+
+  .folderSelectBtn:hover {
+    background: linear-gradient(to bottom, #3eb85d, #1a5d2c);
+  }
+
+  .filesBody {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+  }
+
+  .filesSidebar {
+    width: 240px;
+    background: linear-gradient(to bottom, #FBBC04, #C48F00);
+    border-right: 1px solid #bcd0eb;
+    display: flex;
+    flex-direction: column;
+    padding: 8px 0;
+    gap: 4px;
+  }
+
+  .sidebarItem {
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+    border-radius: 0 20px 20px 0;
+    margin-right: 8px;
+    gap: 12px;
+    font-weight: bold;
+  }
+
+  .sidebarItem:hover {
+    background: rgba(66, 133, 244, 0.1);
+  }
+
+  .sidebarItem.active {
+    background: linear-gradient(to right, #4285F4, #1A56BC);
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  }
+
+  .sidebarIconImg {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+  }
+
+  .filesMainContent {
+    flex: 1;
+    background: linear-gradient(to bottom, #EA4335, #B31412);
+    padding: 24px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .filesGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 16px;
+  }
+
+  .fileCard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 1px solid #c4d7f5;
+    gap: 8px;
+    background: linear-gradient(to bottom, #ffffff, #eef3fc);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+  }
+
+  .fileCard:hover {
+    background: linear-gradient(to bottom, #ffffff, #d8e6fc);
+    border-color: #4285F4;
+    box-shadow: 0 4px 8px rgba(66,133,244,0.2);
+  }
+
+  .fileIcon {
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 4px;
+    background: #fff;
+    border: 1px solid #ddd;
+  }
+
+  .fileIcon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .fileName {
+    font-size: 12px;
+    color: #333;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    word-break: break-all;
+    font-weight: bold;
+  }
+</style>
+</head>
+<body>
+
+<div class="chromeWindow">
+  <div class="tabStrip" id="tabContainer">
+    <img class="stripIcon" src="https://www.image2url.com/r2/default/files/1786547884247-da934c7e-232a-4859-a068-accf28472387.png" alt="Browser Icon">
+    
+    <div class="tab active" dataUrl="chrome://newtab" onclick="switchTab(this)">
+      <div class="tabBg"></div>
+      <div class="tabContent">
+        <img class="tabFavicon" src="https://www.image2url.com/r2/default/files/1786549858308-82af3d1f-4b0b-4286-9822-5b4cea26ecdc.png" alt="">
+        <span class="tabTitle">New Tab</span>
+        <span class="closeBtn" onclick="closeTab(event, this)">×</span>
+      </div>
+    </div>
+    <div class="newTabBtn" title="New tab" onclick="createNewTab()"></div>
+  </div>
+
+  <div class="toolbar">
+    <div class="navBtn" title="Back" onclick="goBack()">
+      <img src="https://www.image2url.com/r2/default/files/1786554766906-5db1a7e6-3f26-445f-bc1f-e6d1b3b1abac.png" alt="Back">
+    </div>
+    <div class="navBtn" title="Forward" onclick="goForward()">
+      <img src="https://www.image2url.com/r2/default/files/1786552526247-7b18f6e9-eacb-4fdb-b966-5238f4666995.png" alt="Forward">
+    </div>
+    <div class="navBtn" title="Reload" onclick="reloadPage()">
+      <img src="https://1.bp.blogspot.com/-xn0FHb3N6Ls/XOmcrsqIeYI/AAAAAAAAKOI/gIqhZjRVyUYEuzyqJ852NvMkcKOuZ8poACLcBGAs/s320/reload-97640_1280.png" alt="Reload">
+    </div>
+    <div class="navBtn" title="Open home page" onclick="processInput('chrome://newtab')">
+      <img src="https://www.image2url.com/r2/default/files/1786550809284-2c8db2de-1e67-4db1-a0b7-f9061a52cb13.png" alt="Home">
+    </div>
+    <div class="navBtn" title="Open URL in new browser tab" onclick="openInNewBrowserTab()">
+      <img src="https://thumbs.dreamstime.com/b/blue-peeling-sticker-8466699.jpg" alt="Open External">
+    </div>
+
+    <div class="omnibox">
+      <input type="text" id="urlInput" placeholder="Type a URL or search phrase" onkeydown="handleEnter(event)">
+      <img class="starIcon" src="https://cdn.creazilla.com/cliparts/20339/star-symbol-clipart-xl.png" alt="Bookmark" title="Bookmark this page">
+    </div>
+
+    <div class="wrenchBtn" title="Customize and control Google Chrome" onclick="openFilesApp()">
+      <img src="https://cdn.freepixel.com/thumb/free-photos-a-close-up-view-of-a-wrench-showcasing-its-details-and-design-it-appears-to-be-a-mechanical-or-engin-th-1004411827.jpg" alt="Wrench">
+    </div>
+  </div>
+
+  <div class="contentContainer">
+    <iframe id="webView" 
+            src="https://www.google.com/webhp?igu=1" 
+            style="overflow:hidden;margin:0;padding:0;width:100%;height:100%;border:none;display:none;" 
+            frameborder="0">
+    </iframe>
+
+    <div id="ntpView" class="viewport">
+      <img class="ntpImage" src="https://g1-addtext.ft-uc.com/MjAyNjA4MTI/addtext_com_MTk1ODM5OmV1NzoxOTU5.png" alt="New Tab Image">
+      <img class="ntpLinkImage" src="https://github.com/u3u2/NaNocks/blob/index.html/favicon.png?raw=true" alt="NaNocks Link" title="Open NaNocks" onclick="openNaNocksTab()">
+    </div>
+
+    <div id="filesView" class="filesView">
+      <div class="filesHeader">
+        <span id="currentFolderName">Files</span>
+        <button class="folderSelectBtn" onclick="triggerFileUpload()">Choose Files</button>
+      </div>
+      <div class="filesBody">
+        <div class="filesSidebar">
+          <div class="sidebarItem active" onclick="switchSidebar('local', event)">
+            <img class="sidebarIconImg" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRuh5E-enF1k4nwbU1o-AmYllvpqTQWimAanFwQ_62KgLTAREmgXqKY3RQ&s=10" alt="">
+            <span>Uploaded Files</span>
+          </div>
+          <div class="sidebarItem" onclick="switchSidebar('downloads', event)">
+            <img class="sidebarIconImg" src="https://d1nhio0ox7pgb.cloudfront.net/_img/v_collection_png/512x512/shadow/data_cloud.png" alt="">
+            <span>Downloads View</span>
+          </div>
+        </div>
+        <div class="filesMainContent">
+          <h3 id="viewTitle" style="color: #1A56BC; font-weight: bold;">My Files</h3>
+          <div class="filesGrid" id="realFilesGrid">
+            <div class="fileCard" onclick="triggerFileUpload()" style="border: 2px dashed #4285F4;">
+              <div class="fileIcon">
+                <img src="https://files.softicons.com/download/application-icons/shimmer-icons-by-creative-freedom/ico/open.ico" alt="Folder">
+              </div>
+              <span class="fileName">Click here to choose files</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const urlInput = document.getElementById('urlInput');
+  const webView = document.getElementById('webView');
+  const ntpView = document.getElementById('ntpView');
+  const filesView = document.getElementById('filesView');
+  const realFilesGrid = document.getElementById('realFilesGrid');
+  const currentFolderName = document.getElementById('currentFolderName');
+  const viewTitle = document.getElementById('viewTitle');
+
+  let uploadedFilesList = [];
+
+  // Track iframe navigation using an interval watcher
+  setInterval(() => {
+    if (webView.style.display !== 'none') {
+      try {
+        const currentLoc = webView.contentWindow.location.href;
+        if (currentLoc && currentLoc !== 'about:blank' && currentLoc !== urlInput.value) {
+          urlInput.value = currentLoc;
+          updateActiveTab(currentLoc, currentLoc, null);
+        }
+      } catch (e) {}
+    }
+  }, 200);
+
+  function handleEnter(e) {
+    if (e.key === 'Enter') {
+      const input = urlInput.value.trim();
+      if (input) {
+        processInput(input);
+      }
+    }
+  }
+
+  function isUrl(str) {
+    if (str.startsWith('http://') || str.startsWith('https://') || str.startsWith('chrome://')) {
+      return true;
+    }
+    const urlPattern = /^[a-zA-Z0-9]+(\.[a-zA-Z]{2,})+(\/.*)?$/;
+    return urlPattern.test(str);
+  }
+
+  function processInput(input) {
+    const fixedFavicon = 'https://www.image2url.com/r2/default/files/1786549858308-82af3d1f-4b0b-4286-9822-5b4cea26ecdc.png';
+
+    if (input === 'chrome://files' || input === 'chrome://file-manager') {
+      showView('files');
+      updateActiveTab('Files', 'chrome://files', 'https://www.image2url.com/r2/default/files/1786547884247-da934c7e-232a-4859-a068-accf28472387.png');
+      urlInput.value = 'chrome://files';
+      return;
+    }
+
+    if (input === 'chrome://newtab' || input === '') {
+      showView('ntp');
+      updateActiveTab('New Tab', 'chrome://newtab', fixedFavicon);
+      urlInput.value = '';
+      return;
+    }
+
+    if (isUrl(input)) {
+      let fullUrl = input;
+      if (!fullUrl.startsWith('http://') && !fullUrl.startsWith('https://') && !fullUrl.startsWith('chrome://')) {
+        fullUrl = 'https://' + fullUrl;
+      }
+      urlInput.value = fullUrl;
+      webView.src = fullUrl;
+      showView('web');
+      
+      let title = fullUrl;
+      try { title = new URL(fullUrl).hostname; } catch(e){}
+      updateActiveTab(title, fullUrl, fixedFavicon);
+    } else {
+      const searchUrl = 'https://www.google.com/search?igu=1&q=' + encodeURIComponent(input);
+      urlInput.value = searchUrl;
+      webView.src = searchUrl;
+      showView('web');
+      
+      updateActiveTab(input + ' Search', searchUrl, fixedFavicon);
+    }
+  }
+
+  function openNaNocksTab() {
+    const newTabBtn = document.querySelector('.newTabBtn');
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    
+    const fixedFavicon = 'https://github.com/u3u2/NaNocks/blob/index.html/favicon.png?raw=true';
+    const targetUrl = 'https://u3u2.github.io/NaNocks';
+    
+    const tabHTML = `
+      <div class="tab active" dataUrl="${targetUrl}" onclick="switchTab(this)">
+        <div class="tabBg"></div>
+        <div class="tabContent">
+          <img class="tabFavicon" src="${fixedFavicon}" alt="">
+          <span class="tabTitle">NaNocks</span>
+          <span class="closeBtn" onclick="closeTab(event, this)">×</span>
+        </div>
+      </div>
+    `;
+    
+    newTabBtn.insertAdjacentHTML('beforebegin', tabHTML);
+    urlInput.value = targetUrl;
+    webView.src = targetUrl;
+    showView('web');
+  }
+
+  function showView(viewName) {
+    webView.style.display = 'none';
+    ntpView.style.display = 'none';
+    filesView.style.display = 'none';
+
+    if (viewName === 'web') {
+      webView.style.display = 'block';
+    } else if (viewName === 'ntp') {
+      ntpView.style.display = 'flex';
+    } else if (viewName === 'files') {
+      filesView.style.display = 'flex';
+    }
+  }
+
+  function openFilesApp() {
+    processInput('chrome://files');
+  }
+
+  function triggerFileUpload() {
+    let fileInput = document.getElementById('hiddenUploadInput');
+    if (!fileInput) {
+      fileInput = document.createElement('input');
+      fileInput.type = 'file';
+      fileInput.id = 'hiddenUploadInput';
+      fileInput.multiple = true;
+      fileInput.style.display = 'none';
+      document.body.appendChild(fileInput);
+
+      fileInput.onchange = (e) => {
+        const files = e.target.files;
+        if (files.length > 0) {
+          for (let i = 0; i < files.length; i++) {
+            if (files[i].name !== 'download.bin') {
+              uploadedFilesList.push(files[i]);
+            }
+          }
+          renderUploadedFiles();
+        }
+      };
+    }
+    fileInput.click();
+  }
+
+  function renderUploadedFiles() {
+    realFilesGrid.innerHTML = '';
+
+    const validFiles = uploadedFilesList.filter(f => f.name !== 'download.bin');
+
+    if (validFiles.length === 0) {
+      realFilesGrid.innerHTML = `
+        <div class="fileCard" onclick="triggerFileUpload()" style="border: 2px dashed #4285F4;">
+          <div class="fileIcon">
+            <img src="https://files.softicons.com/download/application-icons/shimmer-icons-by-creative-freedom/png/256/open.png" alt="Folder">
+          </div>
+          <span class="fileName">Click here to choose files</span>
+        </div>
+      `;
+      return;
+    }
+
+    validFiles.forEach((file) => {
+      const card = document.createElement('div');
+      card.className = 'fileCard';
+
+      const isImage = file.type.startsWith('image/') || /\.(png|jpg|jpeg|gif|webp|svg)$/i.test(file.name);
+      const objectUrl = URL.createObjectURL(file);
+
+      card.onclick = () => {
+        window.open(objectUrl, '_blank');
+      };
+
+      let iconHtml = `<div class="fileIcon"><img src="https://www.freeiconspng.com/uploads/file-zip-icon-3.png" alt="Document"></div>`;
+      if (isImage) {
+        iconHtml = `<div class="fileIcon"><img src="${objectUrl}" alt="${file.name}"></div>`;
+      }
+
+      card.innerHTML = `
+        ${iconHtml}
+        <span class="fileName">${file.name}</span>
+      `;
+      realFilesGrid.appendChild(card);
+    });
+  }
+
+  function switchSidebar(type, e) {
+    document.querySelectorAll('.sidebarItem').forEach(el => el.classList.remove('active'));
+    if (e && e.currentTarget) {
+      e.currentTarget.classList.add('active');
+    }
+
+    if (type === 'local') {
+      viewTitle.textContent = "My Files";
+      renderUploadedFiles();
+    } else {
+      viewTitle.textContent = "Downloads View";
+      realFilesGrid.innerHTML = `
+        <div class="fileCard" onclick="triggerFileUpload()" style="border: 2px dashed #4285F4;">
+          <div class="fileIcon">
+            <img src="https://d1nhio0ox7pgb.cloudfront.net/_img/v_collection_png/512x512/shadow/data_cloud.png" alt="Downloads">
+          </div>
+          <span class="fileName">Upload Files...</span>
+        </div>
+      `;
+    }
+  }
+
+  function updateActiveTab(title, url, faviconUrl) {
+    const activeTab = document.querySelector('.tab.active');
+    if (activeTab) {
+      activeTab.setAttribute('dataUrl', url);
+      const titleSpan = activeTab.querySelector('.tabTitle');
+      titleSpan.textContent = title;
+      const faviconImg = activeTab.querySelector('.tabFavicon');
+      if (faviconImg && faviconUrl) {
+        faviconImg.src = faviconUrl;
+      }
+    }
+  }
+
+  function createNewTab() {
+    const newTabBtn = document.querySelector('.newTabBtn');
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    
+    const fixedFavicon = 'https://www.image2url.com/r2/default/files/1786549858308-82af3d1f-4b0b-4286-9822-5b4cea26ecdc.png';
+    const tabHTML = `
+      <div class="tab active" dataUrl="chrome://newtab" onclick="switchTab(this)">
+        <div class="tabBg"></div>
+        <div class="tabContent">
+          <img class="tabFavicon" src="${fixedFavicon}" alt="">
+          <span class="tabTitle">New Tab</span>
+          <span class="closeBtn" onclick="closeTab(event, this)">×</span>
+        </div>
+      </div>
+    `;
+    
+    newTabBtn.insertAdjacentHTML('beforebegin', tabHTML);
+    processInput('chrome://newtab');
+  }
+
+  function switchTab(tabElement) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tabElement.classList.add('active');
+    const url = tabElement.getAttribute('dataUrl') || 'chrome://newtab';
+    
+    if (url === 'chrome://files') {
+      processInput('chrome://files');
+    } else if (url === 'chrome://newtab') {
+      processInput('chrome://newtab');
+    } else {
+      urlInput.value = url;
+      webView.src = url;
+      showView('web');
+    }
+  }
+
+  function closeTab(event, closeBtn) {
+    event.stopPropagation();
+    const tabToClose = closeBtn.closest('.tab');
+    const allTabs = document.querySelectorAll('.tab');
+    
+    if (allTabs.length === 1) {
+      processInput('chrome://newtab');
+      return;
+    }
+
+    if (tabToClose.classList.contains('active')) {
+      const prevTab = tabToClose.previousElementSibling;
+      if (prevTab && prevTab.classList.contains('tab')) {
+        switchTab(prevTab);
+      } else {
+        const nextTab = tabToClose.nextElementSibling;
+        if (nextTab && nextTab.classList.contains('tab')) {
+          switchTab(nextTab);
+        }
+      }
+    }
+    
+    tabToClose.remove();
+  }
+
+  function goBack() {
+    try { webView.contentWindow.history.back(); } catch(e) { processInput('chrome://newtab'); }
+  }
+
+  function goForward() {
+    try { webView.contentWindow.history.forward(); } catch(e) {}
+  }
+
+  function reloadPage() {
+    const url = urlInput.value;
+    if (url) processInput(url);
+  }
+
+  function openInNewBrowserTab() {
+    const currentUrl = urlInput.value.trim();
+    if (!currentUrl || currentUrl === 'chrome://newtab' || currentUrl === 'chrome://files') {
+      window.open('https://www.google.com/webhp?igu=1', '_blank');
+    } else {
+      let targetUrl = currentUrl;
+      if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
+        targetUrl = 'https://' + targetUrl;
+      }
+      window.open(targetUrl, '_blank');
+    }
+  }
+</script>
+</body>
+</html>
